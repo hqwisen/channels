@@ -195,7 +195,10 @@ class AsgiHandler(base.BaseHandler):
 
     def __call__(self, message):
         # Set script prefix from message root_path, turning None into empty string
-        set_script_prefix(message.get('root_path', '') or '')
+        script_prefix = self.scope.get("root_path", "") or ""
+        if settings.FORCE_SCRIPT_NAME:
+            script_prefix = settings.FORCE_SCRIPT_NAME
+        set_script_prefix(script_prefix)
         signals.request_started.send(sender=self.__class__, message=message)
         # Run request through view system
         try:
